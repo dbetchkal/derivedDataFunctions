@@ -1,18 +1,3 @@
-#######################################################################################################
-#######################################################################################################
-######
-######  File Name: derivedDataFunctions.py
-######  Description: Short functions to simplify the calculation and use of 
-                    # common derived data metrics in environmental acoustics.
-                    # This script has been designed to work with the Python
-                    # library soundDB
-
-######  Created by: Davyd Betchkal and Gabe Joseph
-######  Date created: 02/29/2016              
-######  Date updated: 05/12/2017
-########################################################################################################
-########################################################################################################
-
 import pandas as pd
 import numpy as np
 
@@ -26,10 +11,10 @@ def quantile_Lmax(srcid, q, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -47,7 +32,7 @@ def quantile_Lmax(srcid, q, weight = "A", source = "all"):
             return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].quantile(q)))
     
     else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID == source, lookup[w]].quantile(q)))
+        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].quantile(q)))
 
 
 
@@ -58,9 +43,9 @@ def mad_Lmax(srcid, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     weight: str, specifies the acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
 
     Returns
     -------
@@ -77,7 +62,7 @@ def mad_Lmax(srcid, weight = "A", source = "all"):
             return float("{0:.1f}".format(pd.Series(abs(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].median() - srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]])).median()))
     
     else:
-        return float("{0:.1f}".format(pd.Series(abs(srcid.loc[srcid.srcID == source,lookup[w]].median() - srcid.loc[srcid.srcID == source,lookup[w]])).median()))
+        return float("{0:.1f}".format(pd.Series(abs(srcid.loc[srcid.srcID.isin(source),lookup[w]].median() - srcid.loc[srcid.srcID.isin(source),lookup[w]])).median()))
 
 
 
@@ -88,9 +73,9 @@ def iqr_Lmax(srcid, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -108,7 +93,7 @@ def iqr_Lmax(srcid, weight = "A", source = "all"):
             return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].quantile(0.75) - srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].quantile(0.25)))
     
     else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID == source, lookup[w]].quantile(0.75) - srcid.loc[srcid.srcID == source, lookup[w]].quantile(0.25)))        
+        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].quantile(0.75) - srcid.loc[srcid.srcID.isin(source), lookup[w]].quantile(0.25)))        
 
 
 
@@ -119,9 +104,9 @@ def mean_Lmax(srcid, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -138,7 +123,7 @@ def mean_Lmax(srcid, weight = "A", source = "all"):
             return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].mean()))
     
     else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID == source, lookup[w]].mean()))
+        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].mean()))
 
 
 
@@ -149,9 +134,9 @@ def stdev_Lmax(srcid, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -168,7 +153,7 @@ def stdev_Lmax(srcid, weight = "A", source = "all"):
             return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].std()))
     
     else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID == source, lookup[w]].std()))
+        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].std()))
 
 
 
@@ -179,9 +164,9 @@ def stderr_Lmax(srcid, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -198,7 +183,7 @@ def stderr_Lmax(srcid, weight = "A", source = "all"):
             return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].std()/np.sqrt(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].count())))
     
     else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID == source, lookup[w]].std()/np.sqrt(srcid.loc[srcid.srcID == source, lookup[w]].count())))  
+        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].std()/np.sqrt(srcid.loc[srcid.srcID.isin(source), lookup[w]].count())))  
 
 
 def quantile_SEL(srcid, q, weight = "A", source = "all"):
@@ -207,10 +192,10 @@ def quantile_SEL(srcid, q, weight = "A", source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -228,7 +213,7 @@ def quantile_SEL(srcid, q, weight = "A", source = "all"):
             return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].quantile(q)))
     
     else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID == source, lookup[w]].quantile(q)))
+        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].quantile(q)))
 
 
 #------------------------------------------------------------------------------------------------------------------
@@ -242,8 +227,8 @@ def total_event_duration(srcid, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -258,7 +243,7 @@ def total_event_duration(srcid, source = "all"):
             return srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),"len"].sum()
     
     else:
-        return srcid.loc[srcid.srcID == source,"len"].sum()
+        return srcid.loc[srcid.srcID.isin(source),"len"].sum()
 
 
 
@@ -269,9 +254,9 @@ def quantile_event_duration(srcid, q, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.)   
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -289,7 +274,7 @@ def quantile_event_duration(srcid, q, source = "all"):
     
     else:
         import datetime
-        return datetime.timedelta(seconds = srcid.loc[srcid.srcID == source,"len"].quantile(q).total_seconds())
+        return datetime.timedelta(seconds = srcid.loc[srcid.srcID.isin(source),"len"].quantile(q).total_seconds())
 
 
 
@@ -300,8 +285,8 @@ def mad_event_duration(srcid, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY" 
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library. 
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -321,7 +306,7 @@ def mad_event_duration(srcid, source = "all"):
     
     else:
         import datetime
-        mad = pd.Series(abs(srcid.loc[srcid.srcID == source,"len"].median() - srcid.loc[srcid.srcID == source,"len"])).median()
+        mad = pd.Series(abs(srcid.loc[srcid.srcID.isin(source),"len"].median() - srcid.loc[srcid.srcID.isin(source),"len"])).median()
         return datetime.timedelta(seconds = mad.total_seconds())
 
 
@@ -333,8 +318,8 @@ def iqr_event_duration(srcid, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY" 
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library. 
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -354,7 +339,7 @@ def iqr_event_duration(srcid, source = "all"):
     
     else:
         import datetime
-        iqr = srcid.loc[srcid.srcID == source,"len"].quantile(0.75) - srcid.loc[srcid.srcID == source,"len"].quantile(0.25)
+        iqr = srcid.loc[srcid.srcID.isin(source),"len"].quantile(0.75) - srcid.loc[srcid.srcID.isin(source),"len"].quantile(0.25)
         return datetime.timedelta(seconds = iqr.total_seconds())
 
 
@@ -366,8 +351,8 @@ def mean_event_duration(srcid, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -385,7 +370,7 @@ def mean_event_duration(srcid, source = "all"):
     
     else:
         import datetime
-        return datetime.timedelta(seconds = srcid.loc[srcid.srcID == source,"len"].mean().total_seconds())
+        return datetime.timedelta(seconds = srcid.loc[srcid.srcID.isin(source),"len"].mean().total_seconds())
 
 
   
@@ -395,8 +380,8 @@ def stdev_event_duration(srcid, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -414,7 +399,7 @@ def stdev_event_duration(srcid, source = "all"):
     
     else:
         import datetime
-        return datetime.timedelta(seconds = srcid.loc[srcid.srcID == source,"len"].std().total_seconds())
+        return datetime.timedelta(seconds = srcid.loc[srcid.srcID.isin(source),"len"].std().total_seconds())
 
 
   
@@ -424,8 +409,8 @@ def stderr_event_duration(srcid, source = "all"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -443,7 +428,7 @@ def stderr_event_duration(srcid, source = "all"):
     
     else:
         import datetime
-        return datetime.timedelta(seconds = srcid.loc[srcid.srcID == source,"len"].std().total_seconds()/np.sqrt(srcid.loc[srcid.srcID == source, "len"].count()))
+        return datetime.timedelta(seconds = srcid.loc[srcid.srcID.isin(source),"len"].std().total_seconds()/np.sqrt(srcid.loc[srcid.srcID.isin(source), "len"].count()))
 
 
 
@@ -453,9 +438,9 @@ def total_audible_dur_hourly(dailypa, hour, source = "all"):
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     hour: int, hour of the day to be summarized from 0 to 23.  To summarize the entire day iterate this function with "for hour in range(0, 23)"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -487,9 +472,9 @@ def mean_audible_duration_hourly(dailypa, hour, source = "all"):
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     hour: int, hour of the day to be summarized from 0 to 23.  To summarize the entire day iterate this function with "for hour in range(0, 23)"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -528,8 +513,8 @@ def total_count(srcid, source = "all"):  # will give total props, total jets, to
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", or "air".  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", or "air".  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -543,7 +528,7 @@ def total_count(srcid, source = "all"):  # will give total props, total jets, to
             return srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),"MaxSPL"].count()
 
     else:       
-        return srcid.loc[srcid.srcID == source,"MaxSPL"].count()
+        return srcid.loc[srcid.srcID.isin(source),"MaxSPL"].count()
 
 
 
@@ -554,7 +539,7 @@ def percentageOfAll_bySource(srcid, id_code):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     id_code: float, an srcID code used for annotating noise sources in SPLAT.
     
     Returns
@@ -572,7 +557,7 @@ def percentageOfAir_bySource(srcid, id_code):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     id_code: float, an srcID code used for annotating noise sources in SPLAT.
     
     Returns
@@ -590,7 +575,7 @@ def propJetRatio(srcid):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     
     Returns
     -------
@@ -607,9 +592,9 @@ def DENABCMP_SPL_exceedance(srcid, zone, source = "all"):  # report the percenta
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     zone: str, the Denali backcountry managment plan zone:  "low", "medium", "high", or "very high".  case insensitive.
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", or "air".  Defaults to "all" if unspecified, which is the truest expression of the plan as well.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", or "air".  Defaults to "all" if unspecified, which is the truest expression of the plan as well.
     
     Returns
     -------
@@ -636,9 +621,9 @@ def DENABCMP_SPL_exceedanceRate(srcid, zone, source = "all"):  # the number of e
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     zone: str, the Denali backcountry managment plan zone:  "low", "medium", "high", or "very high".  case insensitive.
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", or "air".  Defaults to "all" if unspecified, which is the truest expression of the plan as well.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", or "air".  Defaults to "all" if unspecified, which is the truest expression of the plan as well.
     
     Returns
     -------
@@ -668,7 +653,7 @@ def number_of_days_splatted(srcid):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     
     Returns
     -------
@@ -686,7 +671,7 @@ def days_splatted(srcid):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     
     Returns
     -------
@@ -705,7 +690,7 @@ def SPLAT_center_date(srcid):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     
     Returns
     -------
@@ -729,8 +714,8 @@ def mean_NFI(srcid, source = "all", unit="hours"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     unit: str, a value that indicates the units desired for the output value.  Defaults to "hours".
     
     Returns
@@ -761,7 +746,7 @@ def mean_NFI(srcid, source = "all", unit="hours"):
     
     else: 
 
-        dt = srcid.loc[srcid.srcID == source, :]
+        dt = srcid.loc[srcid.srcID.isin(source), :]
         dt.sort_index()
 
         NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
@@ -778,9 +763,9 @@ def quantile_NFI(srcid, q, source = "all", unit="hours"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.)   
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     unit: str, a value that indicates the units desired for the output value.  Defaults to "hours".
 
     Returns
@@ -810,7 +795,7 @@ def quantile_NFI(srcid, q, source = "all", unit="hours"):
     
     else: 
 
-        dt = srcid.loc[srcid.srcID == source, :]
+        dt = srcid.loc[srcid.srcID.isin(source), :]
         dt.sort_index()
 
         NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
@@ -825,8 +810,8 @@ def NFI_list(srcid, source = "all", unit="hours"):
 
     Parameters
     ----------
-    srcid: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     unit: str, a value that indicates the units desired for the output value.  Defaults to "hours".
 
     Returns
@@ -856,7 +841,7 @@ def NFI_list(srcid, source = "all", unit="hours"):
     
     else: 
 
-        dt = srcid.loc[srcid.srcID == source, :]
+        dt = srcid.loc[srcid.srcID.isin(source), :]
         dt.sort_index()
 
         NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
@@ -874,10 +859,10 @@ def quantile_hourlyPA(dailypa, q, hour, source = "all"): # PA quantiles by hour 
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
     hour: int, hour of the day to be summarized from 0 to 23.  To summarize the entire day iterate this function with "for hour in range(0, 23):"  
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -904,9 +889,9 @@ def quantile_dailyPA(dailypa, q, source = "all"): # PA quantiles by hour for all
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -931,11 +916,11 @@ def DENABCMP_PA_exceedance(dailypa, zone, start_hour = 0, end_hour = 23, source 
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     zone: str, the Denali backcountry managment plan zone:  "low", "medium", "high", or "very high".  case insensitive.
     start_hour: int, the first hour in the range to be evaluated
     end_hour: int, the last hour in the range to be evaluated
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -994,8 +979,8 @@ def overall_PA(dailypa, source = "all"):
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -1079,9 +1064,9 @@ def quantile_eventsPerDay(dailypa, q, source = "all"):
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -1122,8 +1107,8 @@ def total_events(dailypa, source = "all"):
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -1148,10 +1133,10 @@ def event_saturation(dailypa, start_hour = 0, end_hour = 23, source = "all"):
 
     Parameters
     ----------
-    dailypa: str, a single site specifier in the format "UNITSITEYYYY"
+    dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     start_hour: int, the first hour in the range to be evaluated
     end_hour: int, the last hour in the range to be evaluated
-    source: str or float, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a specific srcID code as a float.  Defaults to "all" if unspecified.
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
     Returns
     -------
@@ -1224,7 +1209,7 @@ def DENABCMP_events_exceedance(loudevents, zone):
 
     Parameters
     ----------
-    loudevents: str, a single site specifier in the format "UNITSITEYYYY"
+    loudevents: pandas dataframe representing NPS NSNSD 'loudevents' file, formatted by soundDB library.
     zone: str, the Denali backcountry managment plan zone:  "low", "medium", "high", or "very high".  case insensitive.
     
     Returns
@@ -1272,7 +1257,7 @@ def L90(metrics, season="Summer", weight = "A"): # the sound pressure level exce
 
     Parameters
     ----------
-    metrics: str, a single site specifier in the format "UNITSITEYYYY"
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
     season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
 
@@ -1294,7 +1279,7 @@ def Lnat(metrics, season="Summer", weight = "A"):
 
     Parameters
     ----------
-    metrics: str, a single site specifier in the format "UNITSITEYYYY"
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
     season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
 
@@ -1314,7 +1299,7 @@ def L50(metrics, season="Summer", weight = "A"): # the sound pressure level exce
 
     Parameters
     ----------
-    metrics: str, a single site specifier in the format "UNITSITEYYYY"
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
     season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
 
@@ -1334,7 +1319,7 @@ def L10(metrics, season="Summer", weight = "A"):
 
     Parameters
     ----------
-    metrics: str, a single site specifier in the format "UNITSITEYYYY"
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
     season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
 
