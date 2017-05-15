@@ -4,11 +4,10 @@ Functions to calculate acoustical metrics from standard NPS derived data files
 <!DOCTYPE html>
 <html>
 <head>
-<title>Derived Data Functions</title>
 </head>
 
 <body>
-<h1> Derived Data Functions</h1>
+<h2> Functions contained in this module:</h2>
 
 
 <h3> AMPLITUDE METRICS FROM SRCID</h3>
