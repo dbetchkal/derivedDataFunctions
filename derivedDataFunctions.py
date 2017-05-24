@@ -5,14 +5,15 @@ import numpy as np
 # ### AMPLITUDE METRICS FROM SRCID
 
 
-def quantile_Lmax(srcid, q, weight = "A", source = "all"):
+def quantile_amplitude(srcid, q, metric = "Lmax", weight = "A", source = "all"):
     """
-    Calculate a quantile for Lmax values of SPLAT-annotated sources at a site.
+    Calculate a quantile for amplitude values of SPLAT-annotated sources at a site.
 
     Parameters
     ----------
     srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
+    metric: str, optional.  The amplitude metric to use when preforming the calculation, either "Lmax" or "SEL". Defaults to "Lmax" if unspecified.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
@@ -21,8 +22,17 @@ def quantile_Lmax(srcid, q, weight = "A", source = "all"):
     formatted float
     """
 
+    # allow the user to enter weighting networks either way, but convert to upper case
     w = weight.upper()
-    lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+
+    # intialize a weighting lookup function based on the metric used
+    if(metric == "Lmax"):
+        lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+    elif(metric == "SEL"):
+        lookup = {"A":"SEL", "T":"SELt"}
+    else:
+        raise ValueError('metric must be either "Lmax" or "SEL"')
+
     
     if(type(source) == str):
         if(source.lower() == "all"):
@@ -37,13 +47,14 @@ def quantile_Lmax(srcid, q, weight = "A", source = "all"):
 
 
 
-def mad_Lmax(srcid, weight = "A", source = "all"):
+def mad_amplitude(srcid, metric = "Lmax", weight = "A", source = "all"):
     """
-    Calculate the median absolute deviation for Lmax values of SPLAT-annotated sources at a site.
+    Calculate the median absolute deviation for amplitude values of SPLAT-annotated sources at a site.
 
     Parameters
     ----------
     srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    metric: str, optional.  The amplitude metric to use when preforming the calculation, either "Lmax" or "SEL". Defaults to "Lmax" if unspecified.
     weight: str, specifies the acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
 
@@ -51,9 +62,19 @@ def mad_Lmax(srcid, weight = "A", source = "all"):
     -------
     formatted float
     """
+
+    # allow the user to enter weighting networks either way, but convert to upper case
     w = weight.upper()
-    lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+
+    # intialize a weighting lookup function based on the metric used
+    if(metric == "Lmax"):
+        lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+    elif(metric == "SEL"):
+        lookup = {"A":"SEL", "T":"SELt"}
+    else:
+        raise ValueError('metric must be either "Lmax" or "SEL"')
     
+
     if(type(source) == str):
         if(source.lower() == "all"):
             return float("{0:.1f}".format(pd.Series(abs(srcid.loc[:,lookup[w]].median() - srcid.loc[:,lookup[w]])).median()))
@@ -67,13 +88,14 @@ def mad_Lmax(srcid, weight = "A", source = "all"):
 
 
 
-def iqr_Lmax(srcid, weight = "A", source = "all"):
+def iqr_amplitude(srcid, metric = "Lmax", weight = "A", source = "all"):
     """
-    Calculate the interquartile range for Lmax values of SPLAT-annotated sources at a site.
+    Calculate the interquartile range for amplitude values of SPLAT-annotated sources at a site.
 
     Parameters
     ----------
     srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    metric: str, optional.  The amplitude metric to use when preforming the calculation, either "Lmax" or "SEL". Defaults to "Lmax" if unspecified.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
@@ -82,9 +104,18 @@ def iqr_Lmax(srcid, weight = "A", source = "all"):
     formatted float
     """
 
+    # allow the user to enter weighting networks either way, but convert to upper case
     w = weight.upper()
-    lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+
+    # intialize a weighting lookup function based on the metric used
+    if(metric == "Lmax"):
+        lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+    elif(metric == "SEL"):
+        lookup = {"A":"SEL", "T":"SELt"}
+    else:
+        raise ValueError('metric must be either "Lmax" or "SEL"')
     
+
     if(type(source) == str):
         if(source.lower() == "all"):
             return float("{0:.1f}".format(srcid.loc[:,lookup[w]].quantile(0.75) - srcid.loc[:,lookup[w]].quantile(0.25)))
@@ -98,13 +129,14 @@ def iqr_Lmax(srcid, weight = "A", source = "all"):
 
 
 
-def mean_Lmax(srcid, weight = "A", source = "all"):
+def mean_amplitude(srcid, metric = "Lmax", weight = "A", source = "all"):
     """
-    Calculate a mean Lmax value for SPLAT-annotated sources at a site.
+    Calculate a mean amplitude value for SPLAT-annotated sources at a site.
 
     Parameters
     ----------
     srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    metric: str, optional.  The amplitude metric to use when preforming the calculation, either "Lmax" or "SEL". Defaults to "Lmax" if unspecified.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
@@ -112,9 +144,18 @@ def mean_Lmax(srcid, weight = "A", source = "all"):
     -------
     formatted float
     """
+    # allow the user to enter weighting networks either way, but convert to upper case
     w = weight.upper()
-    lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
-    
+
+    # intialize a weighting lookup function based on the metric used
+    if(metric == "Lmax"):
+        lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+    elif(metric == "SEL"):
+        lookup = {"A":"SEL", "T":"SELt"}
+    else:
+        raise ValueError('metric must be either "Lmax" or "SEL"')
+
+
     if(type(source) == str):
         if(source.lower() == "all"):
             return float("{0:.1f}".format(srcid.loc[:,lookup[w]].mean()))
@@ -128,13 +169,14 @@ def mean_Lmax(srcid, weight = "A", source = "all"):
 
 
 
-def stdev_Lmax(srcid, weight = "A", source = "all"):
+def stdev_amplitude(srcid, metric = "Lmax", weight = "A", source = "all"):
     """
-    Calculate the standard deviation for Lmax values of SPLAT-annotated sources at a site.
+    Calculate the standard deviation for amplitude values of SPLAT-annotated sources at a site.
 
     Parameters
     ----------
     srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    metric: str, optional.  The amplitude metric to use when preforming the calculation, either "Lmax" or "SEL". Defaults to "Lmax" if unspecified.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
@@ -142,8 +184,17 @@ def stdev_Lmax(srcid, weight = "A", source = "all"):
     -------
     formatted float
     """
+    # allow the user to enter weighting networks either way, but convert to upper case
     w = weight.upper()
-    lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+
+    # intialize a weighting lookup function based on the metric used
+    if(metric == "Lmax"):
+        lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+    elif(metric == "SEL"):
+        lookup = {"A":"SEL", "T":"SELt"}
+    else:
+        raise ValueError('metric must be either "Lmax" or "SEL"')
+
     
     if(type(source) == str):
         if(source.lower() == "all"):
@@ -158,13 +209,14 @@ def stdev_Lmax(srcid, weight = "A", source = "all"):
 
 
 
-def stderr_Lmax(srcid, weight = "A", source = "all"):
+def stderr_amplitude(srcid, metric = "Lmax", weight = "A", source = "all"):
     """
-    Calculate the standard error of the mean for Lmax values of SPLAT-annotated sources at a site.
+    Calculate the standard error of the mean for amplitude values of SPLAT-annotated sources at a site.
 
     Parameters
     ----------
     srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    metric: str, optional.  The amplitude metric to use when preforming the calculation, either "Lmax" or "SEL". Defaults to "Lmax" if unspecified.
     weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
     
@@ -172,9 +224,18 @@ def stderr_Lmax(srcid, weight = "A", source = "all"):
     -------
     formatted float
     """
+    # allow the user to enter weighting networks either way, but convert to upper case
     w = weight.upper()
-    lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+
+    # intialize a weighting lookup function based on the metric used
+    if(metric == "Lmax"):
+        lookup = {"A":"MaxSPL", "T":"MaxSPLt"}
+    elif(metric == "SEL"):
+        lookup = {"A":"SEL", "T":"SELt"}
+    else:
+        raise ValueError('metric must be either "Lmax" or "SEL"')
     
+
     if(type(source) == str):
         if(source.lower() == "all"):
             return float("{0:.1f}".format(srcid.loc[:,lookup[w]].std()/np.sqrt(srcid.loc[:,lookup[w]].count())))
@@ -184,36 +245,6 @@ def stderr_Lmax(srcid, weight = "A", source = "all"):
     
     else:
         return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].std()/np.sqrt(srcid.loc[srcid.srcID.isin(source), lookup[w]].count())))  
-
-
-def quantile_SEL(srcid, q, weight = "A", source = "all"):
-    """
-    Calculate a quantile for Lmax values of SPLAT-annotated sources at a site.
-
-    Parameters
-    ----------
-    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
-    q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
-    weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
-    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
-    
-    Returns
-    -------
-    formatted float
-    """
-
-    w = weight.upper()
-    lookup = {"A":"SEL", "T":"SELt"}
-    
-    if(type(source) == str):
-        if(source.lower() == "all"):
-            return float("{0:.1f}".format(srcid.loc[:,lookup[w]].quantile(q)))
-            
-        elif(source.lower() == "air"):
-            return float("{0:.1f}".format(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),lookup[w]].quantile(q)))
-    
-    else:
-        return float("{0:.1f}".format(srcid.loc[srcid.srcID.isin(source), lookup[w]].quantile(q)))
 
 
 #------------------------------------------------------------------------------------------------------------------
@@ -1058,7 +1089,7 @@ def overall_PA(dailypa, source = "all"):
 #------------------------------------------------------------------------------------------------------------------
 # ### EVENT RATE, COUNT, & SATURATION METRICS FROM DAILYPA
 
-def quantile_eventsPerDay(dailypa, q, source = "all"):   
+def quantile_eventsPerDay(dailypa, q, source = "all"):
     """
     Returns a quantile of daily event rates.  Rates are calculated by source type.
 
@@ -1097,7 +1128,8 @@ def quantile_eventsPerDay(dailypa, q, source = "all"):
             d = pd.concat([props, helos], axis=1).sum(axis = 1).groupby(level = 0).sum()  #this collapses the hierarchical indexing
             return d.quantile(q)
     else:
-            return dailypa.loc[(slice(None), str(source)), "nEvents_24Hr"].quantile(q)
+            query = [str(s) for s in source]
+            return dailypa.loc[(slice(None), query), "nEvents_24Hr"].quantile(q)
 
 
  
@@ -1120,8 +1152,9 @@ def total_events(dailypa, source = "all"):
             
         elif(source.lower() == "air"):
             return dailypa.loc[(slice(None), "Total_1"), "nEvents_24Hr"].sum()
-    else: 
-        return dailypa.loc[(slice(None), str(source)), "nEvents_24Hr"].sum()
+    else:
+        query = [str(s) for s in source]
+        return dailypa.loc[(slice(None), query), "nEvents_24Hr"].sum()
 
 
 
@@ -1140,62 +1173,48 @@ def event_saturation(dailypa, start_hour = 0, end_hour = 23, source = "all"):
     
     Returns
     -------
-    tuple: (number_of_hours_with_events, percentage_of_hours_with_events)
+    tuple: (number_of_hours_with_events_of_source_type, percentage_of_hours_with_events_of_source_type)
 
     """
     hs = str(start_hour).zfill(2) + "h"
     hf = str(end_hour).zfill(2) + "h"
     
-    data1 = dailypa.loc[(slice(None), "Total_All"), hs:hf]
-    q = []
-
-    for index, values in data1.iterrows():
-        date = pd.Timestamp(index[0]) #convert string dates to timestamps
-        hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
-        values.index = date + hours
-        q.append(values)
-    tot = pd.concat(q)
+    totHours = len(dailypa.index.levels[0])*24
     
+    def sat(dailypa, query, hs, hf, tot=totHours):
+        data = dailypa.loc[(slice(None), query), hs:hf] 
+
+        # create a pandas series that contains hourly PA values and is indexed by datetime of each hour
+        indexer = []
+        hourlyPAs = []
+        for index, day in data.iterrows():
+            for i, hour in enumerate(day):
+                indexer.append(pd.Timestamp(index[0]) + pd.to_timedelta(pd.to_numeric(day.index[i][:2]), unit='h'))
+                hourlyPAs.append(float(hour))
+
+        d = pd.Series(hourlyPAs)
+        d.index = indexer
+
+        # it doesn't matter what the value is for this calculation: it's just presence/absence
+        # so overwrite the series with only the unique indices
+        d = d.groupby(d.index).first() 
+        
+        return (len(d), 100*(d.loc[d > 0].count()/tot))
+    
+    
+    # now use the source parameter to generate a query and calculate saturation
     if(type(source) == str):
         if(source.lower() == "all"):
-            data = dailypa.loc[(slice(None), "Total_All"), hs:hf]
-
-            p = []
-            for index, values in data.iterrows():
-                date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
-                values.index = date + hours
-                p.append(values)
-
-            d = pd.concat(p)
-            return (d.count(), 100*(d.loc[d > 0].count()/d.count()))
+            query = "Total_All"
+            return sat(dailypa, query, hs, hf)
             
         elif(source.lower() == "air"):
-            data = dailypa.loc[(slice(None), "Total_1"), hs:hf]
-    
-            p = []
-            for index, values in data.iterrows():
-                date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
-                values.index = date + hours
-                p.append(values)
-
-            d = pd.concat(p)
-
-            return (tot.count(), 100*(d.loc[d > 0].count()/tot.count()))
+            query = "Total_1"
+            return sat(dailypa, query, hs, hf)
   
-    else:    
-        data = dailypa.loc[(slice(None), str(source)), hs:hf]
-        p = []
-
-        for index, values in data.iterrows():
-            date = pd.Timestamp(index[0]) #convert string dates to timestamps
-            hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
-            values.index = date + hours
-            p.append(values)
-        d = pd.concat(p)
-
-        return (tot.count(), 100*(d.loc[d > 0].count()/tot.count()))
+    elif(type(source) == list):    
+        query = [str(s) for s in source]
+        return sat(dailypa, query, hs, hf)
 
 
 
