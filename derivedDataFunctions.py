@@ -1351,3 +1351,48 @@ def L10(metrics, season="Summer", weight = "A"):
     return float("{0:.1f}".format(metrics.ambient.data.loc[season, lookup[w], "overall", "L010"]))
 
 
+
+def Leq(metrics, season="Summer", weight = "A"): 
+    """
+    Returns the equivalent sound pressure level, the logarithmic average of all sample values.
+
+    Parameters
+    ----------
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
+    season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
+    weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
+
+    Returns
+    -------
+    formatted float
+    """
+    w = weight.upper()
+    lookup = {"A":"dBA", "T":"dBT"}
+    return float("{0:.1f}".format(metrics.ambient.data.loc[season, lookup[w], "overall", "Leq"]))
+
+
+
+def Ldn(metrics, season="Summer", weight = "A"): 
+    """
+    Returns the day-night level (Ldn or DNL), which is the equivalent sound pressure level with a 10dB penalty for the hours between 22:00 and 07:00.
+
+    Parameters
+    ----------
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
+    season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
+    weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
+
+    Returns
+    -------
+    formatted float
+    """
+    w = weight.upper()
+    lookup = {"A":"dBA", "T":"dBT"}
+    
+    #
+    hourlyLeq = metrics.hourlyMedian.data.loc[season, lookup[w], "Leq"]
+    increaseNight10dB = hourlyLeq.iloc[0:7].append(hourlyLeq.iloc[22:])+10
+    artificialIncrease = increaseNight10dB.append(hourlyLeq.iloc[7:22]).sort_index()
+    Ldn = 10*np.log10(artificialIncrease.apply(lambda x: pow(10, x/10)).sum())
+
+    return float("{0:.1f}".format(Ldn))
