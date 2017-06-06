@@ -909,7 +909,7 @@ def quantile_hourlyPA(dailypa, q, hour, source = "all"): # PA quantiles by hour 
         elif(source.lower() == "air"):
             return dailypa.loc[(slice(None), "Total_1"), h].quantile(q)
     else:
-        return dailypa.loc[(slice(None), str(source)), h].quantile(q)
+        return dailypa.loc[(slice(None), [str(s) for s in source]), h].quantile(q)
 
 
 
@@ -936,7 +936,11 @@ def quantile_dailyPA(dailypa, q, source = "all"): # PA quantiles by hour for all
         elif(source.lower() == "air"):
             return dailypa.loc[(slice(None), "Total_1"), "00h":"23h"].quantile(q)
     else:
-        return dailypa.loc[(slice(None), str(source)), "00h":"23h"].quantile(q)
+        if(len(source) > 1):
+            raise ValueError("A single source code must be defined.")
+
+        elif(len(source) == 1):
+            return dailypa.loc[(slice(None), [str(s) for s in source]), "00h":"23h"].quantile(q)
 
 
 
@@ -1396,3 +1400,61 @@ def Ldn(metrics, season="Summer", weight = "A"):
     Ldn = 10*np.log10(artificialIncrease.apply(lambda x: pow(10, x/10)).sum())
 
     return float("{0:.1f}".format(Ldn))
+
+
+#------------------------------------------------------------------------------------------------------------------
+# ### STANDARD ACOUSTIC EXCEEDANCE METRICS
+
+def Lx(nvspl, x, dBA_only=True):
+    """
+    Returns the exceedance percentile (Lx) for bands passed from an NVSPL file.
+
+    Parameters
+    ----------
+    nvspl: pandas dataframe representing NPS NSNSD NVSPL file, formatted by soundDB library.
+    x: float, the exceedance level = (100 - percentile), such that x = 10 is the 90th percentile.
+    dBA_only: boolean, optional.  Whether to return a single broadband A-weighted value or all the bands passed in the NVSPL DataFrame. Defaults to a single A-weighted value if unspecified.  
+
+    Returns
+    -------
+    pandas Series (default) or DataFrame
+
+    """
+
+    # tidy up the NVSPL file for processing by dropping the outer index
+    nvspl.reset_index(level=1, drop=True)
+    
+    # which columns in the NVSPL file contain SPL values?
+    SPLColumns = ['12.5', '15.8', '20', '25', '31.5', '40', '50', '63', '80',
+                   '100', '125', '160', '200', '250', '315', '400', '500', '630', '800',
+                   '1000', '1250', '1600', '2000', '2500', '3150', '4000', '5000', '6300',
+                   '8000', '10000', '12500', '16000', '20000', 'dbA']
+
+    # convert x to a quantile value
+    q = (100 - x)/100
+
+    # calculate the quantile for each band passed into the function
+    bands = pd.DataFrame.from_dict({column: nvspl[column].astype(float).quantile(q) for column in nvspl if column in SPLColumns}, orient='index')
+    bands.columns = ["L" + str(x)]
+    bands["BANDS"] = bands.index
+
+    # set up a template with all the columns in order
+    # then merge the columns that were passed
+    templateFrame = pd.DataFrame({'TODROP' : SPLColumns})
+    out = pd.merge(templateFrame, bands, left_on='TODROP', right_on='BANDS', how='outer')
+    
+    # reset the index to the band names
+    out.set_index(out['BANDS'], drop=True, inplace=True)
+    out.index.name = None
+    
+    # then drop the template columns and unused bands
+    out.drop(['TODROP', 'BANDS'], axis=1, inplace=True)
+    out.dropna(inplace=True)
+    
+    # the default will be to return a dBA value
+    if(dBA_only):
+        return out.loc["dbA",:]
+    
+    # else return a dataframe that has all the bands!
+    else:
+        return out
