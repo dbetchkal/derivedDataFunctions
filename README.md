@@ -123,4 +123,12 @@ Lnat(metrics, season="Summer", weight = "A")
 L50(metrics, season="Summer", weight = "A")
 
 L10(metrics, season="Summer", weight = "A")
+
+Leq(metrics, season="Summer", weight = "A")
+
+Ldn(metrics, season="Summer", weight = "A")
+
+Lx(nvspl, x, dBA_only=True)
 ```
+
+
