@@ -1,7 +1,3 @@
-# TEST PUSH TO GITHUB
-# I've only added comments on lines 1, 2
-
-
 import pandas as pd
 import numpy as np
 
@@ -917,7 +913,7 @@ def quantile_hourlyPA(dailypa, q, hour, source = "all"): # PA quantiles by hour 
 
 
 
-def quantile_dailyPA(dailypa, q, source = "all"): # PA quantiles by hour for all sources 
+def quantile_dailyPA(dailypa, q, source = "all", hour_range = [0, 23]): # PA quantiles by hour for all sources 
     """
     Returns a pandas Series containing percent time audible quantiles 
     for each hour of the day for a user-defined source type.
@@ -927,24 +923,29 @@ def quantile_dailyPA(dailypa, q, source = "all"): # PA quantiles by hour for all
     dailypa: pandas dataframe representing NPS NSNSD dailypa file, formatted by soundDB library.
     q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.) 
     source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
+    hour_range: list of integers. Define a time range (inclusive) for which percent time audible should be summarized.  Values are expected in 24-hour time. 
+    
     
     Returns
     -------
     pandas Series of floats
     """
+    
+    start = str(hour_range[0]).zfill(2) + "h"
+    end = str(hour_range[1]).zfill(2) + "h"
 
     if(type(source) == str):
         if(source.lower() == "all"):
-            return dailypa.loc[(slice(None), "Total_All"), "00h":"23h"].quantile(q)
+            return dailypa.loc[(slice(None), "Total_All"), start:end].quantile(q)
             
         elif(source.lower() == "air"):
-            return dailypa.loc[(slice(None), "Total_1"), "00h":"23h"].quantile(q)
+            return dailypa.loc[(slice(None), "Total_1"), start:end].quantile(q)
     else:
         if(len(source) > 1):
             raise ValueError("A single source code must be defined.")
 
         elif(len(source) == 1):
-            return dailypa.loc[(slice(None), [str(s) for s in source]), "00h":"23h"].quantile(q)
+            return dailypa.loc[(slice(None), [str(s) for s in source]), start:end].quantile(q)
 
 
 
