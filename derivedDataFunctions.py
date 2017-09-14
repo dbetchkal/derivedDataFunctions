@@ -708,7 +708,7 @@ def days_splatted(srcid):
     -------
     list of datetimes in chronological order
     """
-    dates = pd.DataFrame(pd.Series(srcid.index.values).dt.date.unique())
+    dates = pd.DataFrame(pd.Series(srcid.index).dt.date.unique())
     dates.columns = ["date"]
     return dates.sort(['date'])  
 
@@ -728,7 +728,7 @@ def SPLAT_center_date(srcid):
     datetime
     """
 
-    dList = pd.Series(srcid.index.values).dt.date.unique()
+    dList = pd.Series(srcid.index).dt.date.unique()
     # remember, .strftime("%Y-%m-%d") will turn this result into a string if you need it in that format
     # for MM/DD format, .strftime("%Y-%m-%d")[5:12].replace("-", "/")  will do the trick
     return dList[len(dList)/2]
