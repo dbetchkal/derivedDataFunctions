@@ -1407,6 +1407,36 @@ def Ldn(metrics, season="Summer", weight = "A"):
     return float("{0:.1f}".format(Ldn))
 
 
+def percentTimeAbove(metrics, threshold, season="Summer", weight = "A", timeRange = "overall"): 
+    """
+    Returns the percentage of a record above a select SPL threshold.
+
+    Parameters
+    ----------
+    metrics: pandas dataframe representing NPS NSNSD metrics file, formatted by soundDB library.
+    threshold: int. The SPL threshold upon which the percentage of time above calculation is based.  Choose from 35, 45, 52, or 60 dB.
+    season: the season for which the metric is desired:  "Summer", "Fall", "Winter", "Spring" all case-sensitive.  Defaults to "Summer".
+    weight: str, optional.  The acoustic weighting used to calculate Lmax, either "A" or "T". Defaults to "A" if unspecified.  
+    timeRange: str, optional. The summary period, either "Day", "Night", or "overall". Defaults to "overall" if unspecified.
+    
+
+    Returns
+    -------
+    formatted float
+    """
+    w = weight.upper()
+    lookup = {"A":"dBA", "T":"dBT"}
+    
+    if threshold not in [35, 45, 52, 60]: 
+        raise ValueError("Percent time above threshold must be either 35, 45, 52, or 60 dB.  Please choose another value.")
+        
+    thresholdStr = str(threshold)+"dB"
+    
+    pTA = metrics.percentTimeAbove.data.loc[season, lookup[w], timeRange, thresholdStr]
+
+    return float("{0:.2f}".format(pTA))
+
+
 #------------------------------------------------------------------------------------------------------------------
 # ### STANDARD ACOUSTIC EXCEEDANCE METRICS
 
