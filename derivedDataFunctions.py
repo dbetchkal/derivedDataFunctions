@@ -1400,7 +1400,7 @@ def Ldn(metrics, season="Summer", weight = "A"):
     
     #
     hourlyLeq = metrics.hourlyMedian.data.loc[season, lookup[w], "Leq"]
-    increaseNight10dB = hourlyLeq.iloc[0:7].append(hourlyLeq.iloc[22:])+10
+    increaseNight10dB = hourlyLeq.iloc[0:7].append(hourlyLeq.iloc[22:])-10
     artificialIncrease = increaseNight10dB.append(hourlyLeq.iloc[7:22]).sort_index()
     Ldn = 10*np.log10(artificialIncrease.apply(lambda x: pow(10, x/10)).sum())
 
