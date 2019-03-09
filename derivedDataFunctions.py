@@ -1025,6 +1025,7 @@ def overall_PA(dailypa, source = "all"):
     Returns
     -------
     float, as a percentage
+
     """
 
     
@@ -1069,7 +1070,9 @@ def overall_PA(dailypa, source = "all"):
             return 100*((d/100)*3600).sum()/(len(tot)*3600)
             
     else:
-        data = dailypa.loc[(slice(None), str(source)), "00h":"23h"] # if a whole number, expects source as "2" instead of "2.0"
+
+        query = [str(s) for s in source]
+        data = dailypa.loc[(slice(None), query), "00h":"23h"] # if a whole number, expects source as "2" instead of "2.0"
 
         p = []
         for index, values in data.iterrows():
