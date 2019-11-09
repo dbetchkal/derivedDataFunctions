@@ -785,56 +785,6 @@ def mean_NFI(srcid, source = "all", unit="hours"):
     
         return NFIlst.mean()
 
-
-
-
-def quantile_NFI(srcid, q, source = "all", unit="hours"): 
-    """
-    Returns the average NFI for selected source type.
-
-    Parameters
-    ----------
-    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
-    q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.)   
-    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
-    unit: str, a value that indicates the units desired for the output value.  Defaults to "hours".
-
-    Returns
-    -------
-    numpy.float64
-    """
-    unitDict = {"seconds":1, "minutes":60, "hours":3600, "days":86400}
-
-    if(type(source) == str):
-        if(source.lower() == "all"):  
- 
-            dt = srcid.sort_index()
-
-            NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
-                if(i < len(dt.index)-1)])
-    
-            return NFIlst.quantile(q)
-        
-        elif(source.lower() == "air"):
-            dt = srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.), :]
-            dt.sort_index()
-
-            NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
-                if(i < len(dt.index)-1)])
-    
-            return NFIlst.quantile(q)
-    
-    else: 
-
-        dt = srcid.loc[srcid.srcID.isin(source), :]
-        dt.sort_index()
-
-        NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
-            if(i < len(dt.index)-1)])
-    
-        return NFIlst.quantile(q)
-      
-
 def NFI_list(srcid, source = "all", unit="hours"): 
     """
     Returns a list of all Noise Free Intervals for selected source type.
@@ -847,39 +797,64 @@ def NFI_list(srcid, source = "all", unit="hours"):
 
     Returns
     -------
-    pandas Series
+    pandas Series of floating-point times
     """
     unitDict = {"seconds":1, "minutes":60, "hours":3600, "days":86400}
 
     if(type(source) == str):
         if(source.lower() == "all"):  
  
-            dt = srcid.sort_index()
+            srcid.sort_index(inplace=True)
 
-            NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
-                if(i < len(dt.index)-1)])
-    
-            return NFIlst
+            # this is by far more straightforward 
+            NFIlst = srcid.index.to_series().diff()
+
+            # we only want non-negative intervals
+            out = pd.Series(np.array([m.total_seconds() for m in NFIlst[NFIlst > "00:00:00"]])/unitDict[unit])
+
+            return out
         
         elif(source.lower() == "air"):
-            dt = srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.), :]
-            dt.sort_index()
+            srcid = srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.), :]
 
-            NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
-                if(i < len(dt.index)-1)])
+            srcid.sort_index(inplace=True)
+
+            NFIlst = srcid.index.to_series().diff()
+
+            out = pd.Series(np.array([m.total_seconds() for m in NFIlst[NFIlst > "00:00:00"]])/unitDict[unit])
     
-            return NFIlst
+            return out
     
     else: 
 
-        dt = srcid.loc[srcid.srcID.isin(source), :]
-        dt.sort_index()
+        srcid = srcid.loc[srcid.srcID.isin(source), :]
+        srcid.sort_index(inplace=True)
 
-        NFIlst = pd.Series([(dt.index[i+1] - (dt.index[i] + dt['len'][i])).total_seconds()/unitDict[unit] for i in range(len(dt.index)+1) 
-            if(i < len(dt.index)-1)])
+        NFIlst = srcid.index.to_series().diff()
+
+        out = pd.Series(np.array([m.total_seconds() for m in NFIlst[NFIlst > "00:00:00"]])/unitDict[unit])
     
-        return NFIlst   
+        return out 
 
+
+def quantile_NFI(srcid, q, source = "all", unit="hours"): 
+    """
+    Returns the quantile NFI for selected source type.
+
+    Parameters
+    ----------
+    srcid: pandas dataframe representing NPS NSNSD srcid file, formatted by soundDB library.
+    q: float, a value that indicates the quantile desired, from 0.0 (minimum) to 1.0 (maximum.)   
+    source: str or list of floats, optional.  Which subset of srcid codes to summarize - choose either "all", "air", or specify a list of srcID codes as float.  Defaults to "all" if unspecified.
+    unit: str, a value that indicates the units desired for the output value.  Defaults to "hours".
+
+    Returns
+    -------
+    numpy.float64
+    """
+
+    return NFI_list(srcid, source = "all", unit="hours").quantile(q)
+      
 
 #------------------------------------------------------------------------------------------------------------------
 # ###PERCENT TIME AUDIBLE METRICS FROM DAILYPA
