@@ -29,7 +29,7 @@ def join_srcID_rows(df):
     return joined
 
 
-def merge_SRCID_hour_breaks(src):
+def merge_SRCID(src):
 
     '''
     Find SRCID annotations that break across hours, and join them to create a
