@@ -954,7 +954,7 @@ def DENABCMP_PA_exceedance(dailypa, zone, start_hour = 0, end_hour = 23, source 
             p = []
             for index, values in data.iterrows():
                 date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+                hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
                 values.index = date + hours
                 p.append(values)
 
@@ -967,7 +967,7 @@ def DENABCMP_PA_exceedance(dailypa, zone, start_hour = 0, end_hour = 23, source 
             p = []
             for index, values in data.iterrows():
                 date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+                hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
                 values.index = date + hours
                 p.append(values)
 
@@ -980,7 +980,7 @@ def DENABCMP_PA_exceedance(dailypa, zone, start_hour = 0, end_hour = 23, source 
         p = []
         for index, values in data.iterrows():
             date = pd.Timestamp(index[0]) #convert string dates to timestamps
-            hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+            hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
             values.index = date + hours
             p.append(values)
 
@@ -1011,7 +1011,7 @@ def overall_PA(dailypa, source = "all"):
             p = []
             for index, values in data.iterrows():
                 date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+                hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
                 values.index = date + hours
                 p.append(values)
 
@@ -1025,7 +1025,7 @@ def overall_PA(dailypa, source = "all"):
             p = []
             for index, values in data.iterrows():
                 date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+                hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
                 values.index = date + hours
                 p.append(values)
 
@@ -1036,7 +1036,7 @@ def overall_PA(dailypa, source = "all"):
             q = []
             for index, values in data1.iterrows():
                 date = pd.Timestamp(index[0]) #convert string dates to timestamps
-                hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+                hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
                 values.index = date + hours
                 q.append(values)
 
@@ -1052,7 +1052,7 @@ def overall_PA(dailypa, source = "all"):
         p = []
         for index, values in data.iterrows():
             date = pd.Timestamp(index[0]) #convert string dates to timestamps
-            hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+            hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
             values.index = date + hours
             p.append(values)
 
@@ -1063,7 +1063,7 @@ def overall_PA(dailypa, source = "all"):
         q = []
         for index, values in data1.iterrows():
             date = pd.Timestamp(index[0]) #convert string dates to timestamps
-            hours = pd.to_timedelta(values.index.str.slice(0,2), unit='h') #this contains hourly offsets in time 
+            hours = pd.to_timedelta(values.index.str.slice(0,2)) #this contains hourly offsets in time 
             values.index = date + hours
             q.append(values)
 

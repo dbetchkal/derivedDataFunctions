@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+import datetime as dt
+
 def join_srcID_rows(df):
 
     '''
@@ -37,6 +41,7 @@ def merge_SRCID(src):
     '''
 
     import datetime as dt
+    import pandas as pd
 
     # these are only the events that end during the last second of the hour
     end_at_hour = src.loc[((src.index + src["len"]).dt.minute==59)&
