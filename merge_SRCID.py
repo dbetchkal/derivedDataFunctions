@@ -35,13 +35,13 @@ def join_srcID_rows(df):
 
 def merge_SRCID(src):
 
+    import pandas as pd
+    import datetime as dt
+
     '''
     Find SRCID annotations that break across hours, and join them to create a
     final, merged SRCID for more accurate calculations.
     '''
-
-    import datetime as dt
-    import pandas as pd
 
     # these are only the events that end during the last second of the hour
     end_at_hour = src.loc[((src.index + src["len"]).dt.minute==59)&
@@ -55,11 +55,12 @@ def merge_SRCID(src):
     # IMPORTANT: these are the starts where there is definitely an ending one second before
     # conveniently the next two lines handle both (1) matching srcid values, 
     # and (2) lots of back-to-back-to-back hour long annotations!
-    matches_end = start_at_hour.loc[(end_at_hour.index + end_at_hour["len"] + dt.timedelta(seconds=1))]
+    matches_end = start_at_hour.copy()
+    matches_end.index = (start_at_hour.index + start_at_hour["len"] + dt.timedelta(seconds=1))
+
 
     # the .isin method is extremely helpful for working backwards to get the matched starts
-    matches_start = end_at_hour.loc[(end_at_hour.index + end_at_hour["len"] + 
-                    dt.timedelta(seconds=1)).isin(start_at_hour.index)]
+    matches_start = end_at_hour[(end_at_hour.index + end_at_hour["len"] + dt.timedelta(seconds=1)).isin(start_at_hour.index)].copy()
 
     # these are the real break-point annotations
     cons = pd.concat([matches_start, matches_end]).sort_index().dropna()
