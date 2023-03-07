@@ -799,14 +799,19 @@ def NFI_list(srcid, source = "all", unit="hours"):
     -------
     pandas Series of floating-point times
     """
+
+    # 'look-up' dictionary to translate time unit from string to integer (in seconds)
     unitDict = {"seconds":1, "minutes":60, "hours":3600, "days":86400}
 
+    # because NFI depends on event timing, 
+    # it is critical to first sort chronologically
+    srcid.sort_index(inplace=True)
+
+    # two of the source categories are built-in as strings ("all", "air")
     if(type(source) == str):
         if(source.lower() == "all"):  
- 
-            srcid.sort_index(inplace=True)
 
-            # this is by far more straightforward 
+            # difference the starting datetime indices to create a list of timedeltas
             NFIlst = srcid.index.to_series().diff()
 
             # we only want non-negative intervals
@@ -815,10 +820,11 @@ def NFI_list(srcid, source = "all", unit="hours"):
             return out
         
         elif(source.lower() == "air"):
+
+            # aviation sources have source ID codes starting with 1: (1., 1.1, 1.2, 1.3, etc.)
             srcid = srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.), :]
 
-            srcid.sort_index(inplace=True)
-
+            # difference the starting datetime indices to create a list of timedeltas
             NFIlst = srcid.index.to_series().diff()
 
             out = pd.Series(np.array([m.total_seconds() for m in NFIlst[NFIlst > "00:00:00"]])/unitDict[unit])
@@ -827,10 +833,12 @@ def NFI_list(srcid, source = "all", unit="hours"):
     
     else: 
 
+        # select only the source ID code of interest
         srcid = srcid.loc[srcid.srcID.isin(source), :]
-        srcid.sort_index(inplace=True)
 
+        # difference the starting datetime indices to create a list of timedeltas
         NFIlst = srcid.index.to_series().diff()
+
 
         out = pd.Series(np.array([m.total_seconds() for m in NFIlst[NFIlst > "00:00:00"]])/unitDict[unit])
     
