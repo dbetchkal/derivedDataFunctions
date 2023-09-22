@@ -15,20 +15,25 @@ def join_srcID_rows(df):
     new_U = df['Hz_U'].max()
     new_MaxA = "{0:.01f}".format(df["MaxSPL"].max())
 
+    new_user = df.head(1)["userName"].values[0]
+    new_tagdate = df.tail(1)["tagDate"][0]
+
     # because SEL values are already normalized you just logarithmically add them
     # this gives the total energy dose
     new_SELA = "{0:.01f}".format(10*np.log10(np.power(10, df["SEL"]/10).sum()))
 
     # repeat for truncated values
-    new_MaxT = "{0:.01f}".format(df["MaxSPLt"].max())
-    new_SELT = "{0:.01f}".format(10*np.log10(np.power(10, df["SELt"]/10).sum()))
+    # older SRCID files do not have these values, resulting in a KeyError, so we exept those cases
+    try:
+        new_MaxT = "{0:.01f}".format(df["MaxSPLt"].max())
+        new_SELT = "{0:.01f}".format(10*np.log10(np.power(10, df["SELt"]/10).sum()))
 
-    new_user = df.head(1)["userName"].values[0]
-    new_tagdate = df.tail(1)["tagDate"][0]
+        joined = pd.DataFrame([new_length, new_srcID, new_L, new_U, new_MaxA, new_SELA, new_MaxT, new_SELT, new_user, new_tagdate], 
+                     columns=[new_begin], index=df.columns[:-1]).T
 
-
-    joined = pd.DataFrame([new_length, new_srcID, new_L, new_U, new_MaxA, new_SELA, new_MaxT, new_SELT, new_user, new_tagdate], 
-                 columns=[new_begin], index=df.columns[:-1]).T
+    except KeyError:
+        joined = pd.DataFrame([new_length, new_srcID, new_L, new_U, new_MaxA, new_SELA, new_user, new_tagdate], 
+             columns=[new_begin], index=df.columns[:-1]).T
 
     return joined
 
