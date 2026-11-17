@@ -455,7 +455,7 @@ def stderr_event_duration(srcid, source = "all"):
             
         elif(source.lower() == "air"):
             import datetime
-            return datetime.timedelta(seconds = srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),"len"].std().total_seconds()/np.sqrt(srcid.loc[:, "len"].count()))
+            return datetime.timedelta(seconds = srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.),"len"].std().total_seconds()/np.sqrt(srcid.loc[(srcid.srcID > 0) & (srcid.srcID < 2.), "len"].count()))
     
     else:
         import datetime
